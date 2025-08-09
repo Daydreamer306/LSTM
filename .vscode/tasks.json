@@ -1,0 +1,69 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Setup PAI-DSW Environment",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"setup_pai_dsw.py"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Train LSTM-Transformer Model (PAI-DSW)",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"src/training/train.py",
+				"--config",
+				"configs/lstm_transformer.yaml"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": [],
+			"dependsOn": "Setup PAI-DSW Environment"
+		},
+		{
+			"label": "Data Preprocessing",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"src/data/preprocess.py"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Model Inference",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"src/inference/predict.py",
+				"--model_path",
+				"/mnt/workspace/models/best_model.pt"
+			],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Export ONNX Model",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"src/inference/export_onnx.py",
+				"--model_path",
+				"/mnt/workspace/models/best_model.pt",
+				"--output_path",
+				"/mnt/workspace/models/model.onnx"
+			],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

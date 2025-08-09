@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  lstm-transformer-training:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: lstm_transformer_training
+    volumes:
+      - ../data:/workspace/data
+      - ../models:/workspace/models  
+      - ../results:/workspace/results
+      - ../logs:/workspace/logs
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/workspace
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ["python", "src/training/train.py", "--config", "configs/lstm_transformer.yaml"]
+    
+  lstm-transformer-inference:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: lstm_transformer_inference
+    volumes:
+      - ../data:/workspace/data
+      - ../models:/workspace/models
+      - ../results:/workspace/results
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/workspace
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ["python", "src/inference/predict.py", "--model_path", "models/best_model.pt"]

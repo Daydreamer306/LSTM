@@ -1,0 +1,46 @@
+# Core dependencies - PAI-DSW兼容版本
+torch>=1.13.0,<2.1.0  # PAI-DSW推荐版本范围
+torchvision>=0.14.0,<0.16.0
+torchaudio>=0.13.0,<0.15.0
+
+# Transformer and attention mechanisms  
+transformers>=4.21.0,<4.35.0  # 稳定版本，避免兼容性问题
+torch-audio>=0.13.0
+
+# Data processing
+pandas>=1.5.0,<2.1.0
+numpy>=1.21.0,<1.25.0  # PAI-DSW Python版本兼容
+scikit-learn>=1.1.0,<1.4.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Model export and inference - PAI-DSW优化
+onnx>=1.12.0,<1.15.0
+onnxruntime>=1.12.0,<1.16.0  # CPU版本，PAI-DSW环境稳定
+# onnxruntime-gpu>=1.12.0,<1.16.0  # 如需GPU推理可取消注释
+
+# Configuration management
+pyyaml>=6.0,<7.0
+omegaconf>=2.2.0,<2.4.0
+
+# Monitoring and logging - PAI-DSW集成
+tensorboard>=2.10.0,<2.15.0
+# wandb>=0.13.0,<0.16.0  # PAI-DSW可能有网络限制，按需启用
+tqdm>=4.64.0
+
+# Utility
+joblib>=1.2.0
+psutil>=5.9.0
+
+# Development tools
+pytest>=7.2.0
+black>=22.0.0
+isort>=5.10.0
+flake8>=5.0.0
+
+# PAI-DSW特定依赖
+alibabacloud-pai-dsw>=1.0.0  # PAI-DSW SDK
+oss2>=2.15.0  # 阿里云OSS存储集成，用于数据和模型存储

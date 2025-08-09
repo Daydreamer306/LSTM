@@ -1,0 +1,124 @@
+# LSTM + Transformer 工业时序预测模型配置文件
+
+# 数据相关配置
+data:
+  train_file: "/mnt/workspace/data/train.csv"  # PAI-DSW工作空间路径
+  time_ranges_file: "/mnt/workspace/data/time_ranges.json" 
+  sequence_length: 60  # 输入序列长度
+  prediction_length: 10  # 预测未来步数
+  target_columns: ["信号123", "信号124"]  # 目标变量
+  feature_columns: null  # 特征列，null表示使用除目标列外的所有列
+  
+  # 数据划分比例
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  
+  # 数据预处理
+  normalize: true
+  scaler_type: "StandardScaler"  # StandardScaler, MinMaxScaler, RobustScaler
+  save_scaler: true
+
+# 模型相关配置
+model:
+  # LSTM配置
+  lstm:
+    input_size: null  # 将在运行时根据特征数量自动设置
+    hidden_size: 128
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: true
+    
+  # Transformer配置  
+  transformer:
+    d_model: 256  # 模型维度，应该与LSTM hidden_size匹配 (考虑双向)
+    nhead: 8  # 多头注意力头数
+    num_layers: 4  # Transformer编码器层数
+    dim_feedforward: 512  # 前馈网络维度
+    dropout: 0.1
+    activation: "gelu"
+    
+  # 预测头配置
+  prediction_head:
+    hidden_dims: [128, 64]  # 全连接层维度
+    dropout: 0.1
+    output_dim: 2  # 输出维度 (信号123, 信号124)
+
+# 训练相关配置
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  num_epochs: 100
+  patience: 10  # 早停耐心值
+  
+  # 优化器配置
+  optimizer: "Adam"  # Adam, AdamW, SGD
+  weight_decay: 1e-5
+  
+  # 学习率调度
+  scheduler: "ReduceLROnPlateau"  # ReduceLROnPlateau, CosineAnnealingLR, StepLR
+  scheduler_params:
+    mode: "min"
+    factor: 0.5
+    patience: 5
+    
+  # 损失函数
+  loss_function: "MSELoss"  # MSELoss, L1Loss, SmoothL1Loss, HuberLoss
+  
+  # 梯度裁剪
+  gradient_clip_val: 1.0
+
+# 验证和评估
+validation:
+  val_interval: 1  # 验证间隔 (epochs)
+  save_best_model: true
+  monitor_metric: "val_mae"  # 监控指标: val_loss, val_mae, val_mse
+  
+# 输出和日志
+output:
+  model_save_path: "/mnt/workspace/models/"  # PAI-DSW持久化存储路径
+  results_save_path: "/mnt/workspace/results/"
+  checkpoint_path: "/mnt/workspace/checkpoints/"  # 检查点保存路径
+  log_interval: 10  # 日志输出间隔 (steps)
+  save_predictions: true
+  save_visualizations: true
+
+# ONNX导出配置
+onnx:
+  export_path: "/mnt/workspace/models/model.onnx"
+  input_shape: [1, 60, null]  # [batch_size, sequence_length, num_features]
+  dynamic_axes:
+    input: {0: "batch_size"}
+    output: {0: "batch_size"}
+  opset_version: 14
+
+# 可视化配置
+visualization:
+  plot_training_curves: true
+  plot_predictions: true
+  plot_attention_weights: true
+  save_format: "png"  # png, pdf, svg
+  dpi: 300
+
+# 设备和性能 - PAI-DSW优化配置
+device:
+  use_gpu: true
+  gpu_ids: [0]  # PAI-DSW通常提供单GPU
+  mixed_precision: true  # 混合精度训练，节省显存
+  compile_model: false  # PyTorch 2.0模型编译（PAI-DSW环境可能不稳定）
+  
+# PAI-DSW特定配置
+pai_dsw:
+  instance_type: "ecs.gn6i-c4g1.xlarge"  # GPU实例规格
+  workspace_path: "/mnt/workspace"  # PAI-DSW工作空间挂载路径
+  persistent_storage: true  # 启用持久化存储
+  auto_save_interval: 300  # 自动保存间隔（秒）
+
+# 随机种子
+seed: 42
+
+# 调试模式
+debug:
+  enabled: false
+  max_batches: 10  # 调试时最大batch数量
+  profile: false  # 性能分析

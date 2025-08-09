@@ -1,0 +1,16 @@
+{
+    "model_paths": [
+        "/mnt/workspace/models/best_model.pt",
+        "/mnt/workspace/models/checkpoint_epoch_50.pt"
+    ],
+    "data_paths": [
+        "/mnt/workspace/data/test_data.csv"
+    ],
+    "output_dir": "/mnt/workspace/results/batch_predictions",
+    "device": "cuda",
+    "batch_size": 32,
+    "sequence_length": 96,
+    "max_workers": 4,
+    "save_individual_results": true,
+    "ensemble_method": "mean"
+}
